@@ -1,0 +1,105 @@
+services:
+  app:
+    image: "event_linker_back_end"
+    build:
+      context: .
+    container_name: "event_linker_back_end"
+    depends_on:
+      - kafka
+      - redis
+      - db
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${DEFAULT_ACTIVE_PROFILE}
+      - SPRING_DATASOURCE_URL=${APP_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${DB_AUTH_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_AUTH_PASSWORD}
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+    networks:
+      - app-network
+  db:
+    image: "postgres:latest"
+    container_name: event_linker_db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${DB_AUTH_USERNAME}
+      - POSTGRES_PASSWORD=${DB_AUTH_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+  redis:
+    image: redis:alpine
+    container_name: event_linker_redis
+    environment:
+      - SPRING_REDIS_HOST=${REDIS_HOST}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+
+  angular-app:
+    build:
+      context: ../EventLinkerFrontEnd/
+      dockerfile: DockerFile
+    container_name: angular-app
+    volumes:
+      - ../EventLinkerFrontEnd:/app
+      - /app/node_modules
+    ports:
+      - "4200:4200"
+    command: npm run start
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: event_linker_zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT}
+      ZOOKEEPER_DATA_DIR: /var/lib/zookeeper/data
+      ZOOKEEPER_LOG_DIR: /var/lib/zookeeper/log
+    networks:
+      - app-network
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-logs:/var/lib/zookeeper/log
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: event_linker_kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CLUSTER_ID: "event-linker-cluster"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    networks:
+      - app-network
+
+volumes:
+  pg-data:
+  redis-data:
+  kafka-data:
+  zookeeper-data:
+  zookeeper-logs:
+
+networks:
+  app-network:
+    driver: bridge
