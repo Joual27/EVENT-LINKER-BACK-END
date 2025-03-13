@@ -1,5 +1,6 @@
 package org.youcode.EventLinkerAPI.auth.refreshToken.interfaces;
 
+import org.springframework.http.ResponseCookie;
 import org.youcode.EventLinkerAPI.auth.refreshToken.RefreshToken;
 
 public interface RefreshTokenService {
@@ -7,4 +8,5 @@ public interface RefreshTokenService {
     RefreshToken findByToken(String token);
     boolean isTokenExpired(RefreshToken token);
     void deleteToken(RefreshToken token);
+    ResponseCookie createRefreshTokenCookie(String refreshToken);
 }

@@ -1,5 +1,6 @@
 package org.youcode.EventLinkerAPI.shared.utils.exceptionHandling.rest;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindException;
@@ -52,9 +53,15 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TokenExpiredException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorDTO handleTokenExpiredException(TokenExpiredException e) {
-        return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), e.getMessage(), LocalDateTime.now());
+        return new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), e.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorDTO handleTokenExpiredException(ExpiredJwtException e) {
+        return new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), e.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

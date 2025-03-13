@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.youcode.EventLinkerAPI.user.User;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -56,9 +57,8 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", getRoles(userDetails));
-        return createToken(claims, userDetails.getUsername());
+        User user = (User) userDetails;
+        return createToken(userDetails);
     }
 
 
@@ -68,10 +68,17 @@ public class JwtService {
                 .collect(Collectors.toList());
     }
 
-    private String createToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+    private String createToken(UserDetails userDetails) {
+        User user = (User) userDetails;
+
+        return Jwts.builder()
+                .claim("roles", getRoles(userDetails))
+                .claim("username", user.getUsernameField())
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(jwtSecretKey , SignatureAlgorithm.HS256).compact();
+                .signWith(jwtSecretKey, SignatureAlgorithm.HS256)
+                .compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {

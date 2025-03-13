@@ -13,9 +13,15 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.youcode.EventLinkerAPI.shared.utils.security.CustomAccessDeniedHandler;
+import org.youcode.EventLinkerAPI.shared.utils.security.CustomAuthenticationEntryPoint;
 import org.youcode.EventLinkerAPI.shared.utils.security.CustomUserDetailsService;
 import org.youcode.EventLinkerAPI.shared.utils.security.JwtReqFilter;
+
+import java.util.List;
 
 
 @AllArgsConstructor
@@ -25,10 +31,12 @@ public class SecurityConfig {
     private final JwtReqFilter jwtReqFilter;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final CustomUserDetailsService userDetailsService;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
+                .cors(httpSecurityCorsConfigurer-> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/v1/public/**").permitAll()
@@ -36,7 +44,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/organizer/**").hasRole("ORGANIZER")
                         .requestMatchers("/api/v1/worker/**").hasRole("WORKER")
                         .requestMatchers("/api/v1/refresh-token").permitAll()
-                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/ws/**").hasAnyRole("ORGANIZER", "WORKER")
                         .requestMatchers("/api/v1/reviews").hasAnyRole("ORGANIZER", "WORKER")
                         .requestMatchers("/api/v1/logout").hasAnyRole("ORGANIZER", "WORKER" , "ADMIN")
                         .anyRequest().authenticated()
@@ -47,6 +55,7 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling ->
                         exceptionHandling.accessDeniedHandler(accessDeniedHandler)
                 )
+                .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(authenticationEntryPoint))
                 .addFilterBefore(jwtReqFilter , UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
@@ -59,5 +68,19 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder(){
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200"));
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST" , "PUT" , "DELETE" , "PATCH"));
+        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.setAllowedHeaders(List.of("*"));
+        corsConfiguration.setExposedHeaders(List.of("Set-Cookie" , "Authorization"));
+        corsConfiguration.setMaxAge(3600L);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfiguration);
+        return source;
     }
 }

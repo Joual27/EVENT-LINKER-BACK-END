@@ -3,6 +3,7 @@ package org.youcode.EventLinkerAPI.user;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.youcode.EventLinkerAPI.exceptions.EntityNotFoundException;
+import org.youcode.EventLinkerAPI.user.DTOs.UserResponseDTO;
 import org.youcode.EventLinkerAPI.user.interfaces.UserService;
 
 
@@ -16,5 +17,11 @@ public class UserServiceImp implements UserService {
     public User getUserEntityById(Long id){
         return userDAO.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("No user found with given ID !"));
+    }
+
+    @Override
+    public UserResponseDTO getUserData(Long id) {
+        User user = getUserEntityById(id);
+        return UserResponseDTO.fromUser(user);
     }
 }

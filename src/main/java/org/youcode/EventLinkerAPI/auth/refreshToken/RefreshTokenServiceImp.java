@@ -1,5 +1,6 @@
 package org.youcode.EventLinkerAPI.auth.refreshToken;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.youcode.EventLinkerAPI.auth.refreshToken.interfaces.RefreshTokenService;
 import org.youcode.EventLinkerAPI.exceptions.EntityNotFoundException;
@@ -51,5 +52,17 @@ public class RefreshTokenServiceImp implements RefreshTokenService {
     @Override
     public void deleteToken(RefreshToken token) {
         refreshTokenDAO.delete(token);
+    }
+
+    @Override
+    public ResponseCookie createRefreshTokenCookie(String refreshToken) {
+        System.out.println("----refresh token : allo " + refreshToken);
+        return ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(false) // dev mode only
+                .sameSite("Lax")
+                .maxAge(7 * 24 * 60 * 60)
+                .path("/")
+                .build();
     }
 }
