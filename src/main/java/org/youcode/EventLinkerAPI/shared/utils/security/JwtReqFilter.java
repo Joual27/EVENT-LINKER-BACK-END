@@ -23,6 +23,13 @@ public class JwtReqFilter extends OncePerRequestFilter {
 
     @Override
     public void doFilterInternal(HttpServletRequest request , HttpServletResponse response , FilterChain chain) throws ServletException , IOException{
+
+        String path = request.getRequestURI();
+
+        if (path.startsWith("/api/v1/public/") || path.equals("/api/v1/refresh-token")) {
+            chain.doFilter(request, response);
+            return;
+        }
         final String authorizationHeader = request.getHeader("authorization");
         String email = null ;
         String token = null;

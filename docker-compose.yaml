@@ -44,18 +44,18 @@ services:
       - redis-data:/data
     networks:
       - app-network
-
   angular-app:
     build:
-      context: ../EventLinkerFrontEnd/
+      context: ../front-end/
       dockerfile: DockerFile
     container_name: angular-app
     volumes:
-      - ../EventLinkerFrontEnd:/app
+      - ../front-end:/app
       - /app/node_modules
     ports:
       - "4200:4200"
     command: npm run start
+    network_mode: "host"
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
