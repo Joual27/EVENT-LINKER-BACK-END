@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.youcode.EventLinkerAPI.auth.refreshToken.interfaces.RefreshTokenService;
+import org.youcode.EventLinkerAPI.shared.utils.DTOs.SuccessDTO;
 import org.youcode.EventLinkerAPI.user.DTOs.AuthResponseDTO;
 import org.youcode.EventLinkerAPI.user.DTOs.LogoutDTO;
 import org.youcode.EventLinkerAPI.user.interfaces.AuthService;
@@ -26,9 +27,9 @@ public class RefreshTokenController {
                 .header(HttpHeaders.SET_COOKIE, refreshTokenService.createRefreshTokenCookie(refreshToken).toString())
                 .body(res);
     }
-    @PostMapping("logout")
-    public ResponseEntity<String> logout(@RequestBody @Valid LogoutDTO req){
-        authService.logout(req);
-        return new ResponseEntity<>("Logout out successfully" , HttpStatus.OK);
+    @GetMapping("logout")
+    public ResponseEntity<SuccessDTO<String>> logout(@CookieValue(name = "refreshToken") String refreshToken){
+        authService.logout(refreshToken);
+        return new ResponseEntity<>(new SuccessDTO<>("success" , "Logged Out Successfully!" , "Logged Out Successfully!" ) , HttpStatus.OK);
     }
 }

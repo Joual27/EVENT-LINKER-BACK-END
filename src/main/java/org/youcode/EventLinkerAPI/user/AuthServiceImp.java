@@ -68,8 +68,8 @@ public class AuthServiceImp implements AuthService {
 
     @Transactional
     @Override
-    public void logout(LogoutDTO data) {
-        RefreshToken refreshToken = refreshTokenService.findByToken(data.token());
+    public void logout(String token) {
+        RefreshToken refreshToken = refreshTokenService.findByToken(token);
         refreshTokenService.deleteToken(refreshToken);
     }
 

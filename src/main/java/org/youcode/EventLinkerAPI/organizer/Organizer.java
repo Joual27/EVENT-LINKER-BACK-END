@@ -21,7 +21,6 @@ public class Organizer extends User {
     private String organizationName;
     @OneToMany(mappedBy = "organizer" , fetch = FetchType.EAGER)
     private List<Event> events;
-
     @Override
     public String getUserRole() {
         return "ORGANIZER";

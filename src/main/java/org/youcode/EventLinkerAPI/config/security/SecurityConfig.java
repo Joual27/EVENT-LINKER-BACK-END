@@ -46,6 +46,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/refresh-token").permitAll()
                         .requestMatchers("/ws/**").hasAnyRole("ORGANIZER", "WORKER")
                         .requestMatchers("/api/v1/reviews").hasAnyRole("ORGANIZER", "WORKER")
+                        .requestMatchers("/api/v1/users/**").hasAnyRole("ORGANIZER", "WORKER")
                         .requestMatchers("/api/v1/logout").hasAnyRole("ORGANIZER", "WORKER" , "ADMIN")
                         .anyRequest().authenticated()
                 )

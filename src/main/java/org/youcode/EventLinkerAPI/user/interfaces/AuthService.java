@@ -10,5 +10,5 @@ public interface AuthService {
     AuthResponseDTO createUser(String userType , BaseRegistrationDTO data);
     AuthResponseDTO authenticate(LoginDTO credentials);
     AuthResponseDTO refreshToken(String token);
-    void logout(LogoutDTO data);
+    void logout(String token);
 }
