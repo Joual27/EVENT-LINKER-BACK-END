@@ -1,6 +1,7 @@
 package org.youcode.EventLinkerAPI.user.DTOs;
 
 import lombok.*;
+import org.youcode.EventLinkerAPI.review.Review;
 import org.youcode.EventLinkerAPI.skill.Skill;
 import org.youcode.EventLinkerAPI.event.Event;
 import org.youcode.EventLinkerAPI.user.User;
@@ -25,6 +26,8 @@ public class UserResponseDTO {
     private Boolean isOrganization;
     private Double balance;
     private List<Skill> skills;
+    private String bio;
+    private List<Review> reviews;
 
     private String organizationName;
     private List<Event> events;
@@ -35,6 +38,8 @@ public class UserResponseDTO {
                 .username(user.getUsernameField())
                 .email(user.getEmail())
                 .createdAt(user.getCreatedAt())
+                .bio(user.getBio())
+                .reviews(user.getWrittenReviews())
                 .role(user.getUserRole());
 
         if (user instanceof Worker worker) {
@@ -45,7 +50,6 @@ public class UserResponseDTO {
             builder.organizationName(organizer.getOrganizationName())
                     .events(organizer.getEvents());
         }
-
         return builder.build();
     }
 }

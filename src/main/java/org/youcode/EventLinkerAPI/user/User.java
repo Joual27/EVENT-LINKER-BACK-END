@@ -27,6 +27,7 @@ public abstract class User implements UserDetails {
     private String username;
     private String email;
     private String password;
+    private String bio;
     private LocalDateTime createdAt;
 
     @ToString.Exclude
@@ -34,7 +35,7 @@ public abstract class User implements UserDetails {
     private List<Review> writtenReviews;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "reviewee")
+    @OneToMany(mappedBy = "reviewee" , fetch = FetchType.EAGER)
     private List<Review> receivedReviews;
 
     @ManyToMany(mappedBy = "users")
@@ -43,6 +44,7 @@ public abstract class User implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private List<Message> messages;
+
 
     @Override
     public List<GrantedAuthority> getAuthorities() {
