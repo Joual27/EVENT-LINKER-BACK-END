@@ -20,7 +20,6 @@ public class Event extends BaseEntity {
     private LocalDateTime date;
     private String location;
 
-
     @ManyToOne
     @JoinColumn(name = "ORGANIZER_ID")
     @ToString.Exclude
