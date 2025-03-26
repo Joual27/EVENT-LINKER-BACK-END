@@ -2,6 +2,7 @@ package org.youcode.EventLinkerAPI.review.mapper;
 
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.youcode.EventLinkerAPI.application.mapper.ApplicationMapper;
 import org.youcode.EventLinkerAPI.review.DTOs.EmbeddedReviewDTO;
 import org.youcode.EventLinkerAPI.review.DTOs.ReviewResponseDTO;

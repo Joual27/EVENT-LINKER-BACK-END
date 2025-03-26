@@ -15,11 +15,13 @@ import org.youcode.EventLinkerAPI.review.DTOs.ReviewResponseDTO;
 import org.youcode.EventLinkerAPI.review.DTOs.SubmitReviewDTO;
 import org.youcode.EventLinkerAPI.review.interfaces.ReviewService;
 import org.youcode.EventLinkerAPI.review.mapper.ReviewMapper;
+import org.youcode.EventLinkerAPI.shared.utils.DTOs.PaginationDTO;
 import org.youcode.EventLinkerAPI.user.DTOs.EmbeddedUserDTO;
 import org.youcode.EventLinkerAPI.user.User;
 import org.youcode.EventLinkerAPI.user.interfaces.UserService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @Service
@@ -46,15 +48,16 @@ public class ReviewServiceImp implements ReviewService {
     @Override
     public AverageReviewResponseDTO getUserAvgReview() {
         User authenticatedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return new AverageReviewResponseDTO(new EmbeddedUserDTO(authenticatedUser.getEmail()) , reviewDAO.getAvgRatingByReviewee(authenticatedUser) , getUserReviewsCount(authenticatedUser));
+        return new AverageReviewResponseDTO(new EmbeddedUserDTO(authenticatedUser.getEmail() , authenticatedUser.getProfileImgUrl()) , reviewDAO.getAvgRatingByReviewee(authenticatedUser) , getUserReviewsCount(authenticatedUser));
     }
 
     @Override
-    public Page<ReviewResponseDTO> getUserReviews(int page , int size) {
-        User authenticatedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public PaginationDTO<List<ReviewResponseDTO>> getUserReviews(int page , int size , Long id) {
+        User existingUser = userService.getUserEntityById(id);
         PageRequest pageRequest = PageRequest.of(page , size);
-        Page<Review> reviews = reviewDAO.findByReviewee( pageRequest ,authenticatedUser);
-        return reviews.map(reviewMapper::toResponseDTO);
+        Page<Review> reviews = reviewDAO.findByReviewee( pageRequest , existingUser);
+        Page<ReviewResponseDTO> res =  reviews.map(reviewMapper::toResponseDTO);
+        return new PaginationDTO<>(reviews.hasNext() , reviews.hasPrevious() , res.getContent());
     }
 
 

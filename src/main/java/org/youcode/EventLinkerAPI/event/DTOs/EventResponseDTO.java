@@ -5,5 +5,5 @@ import org.youcode.EventLinkerAPI.organizer.DTOs.EmbeddedOrganizerDTO;
 
 import java.time.LocalDateTime;
 
-public record EventResponseDTO(Long id , String description , LocalDateTime date , String location , EmbeddedOrganizerDTO organizer) {
+public record EventResponseDTO(Long id ,String title , String description , LocalDateTime date , String imgUrl , String location , EmbeddedOrganizerDTO organizer) {
 }

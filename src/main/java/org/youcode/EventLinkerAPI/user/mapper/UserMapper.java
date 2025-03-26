@@ -1,8 +1,11 @@
 package org.youcode.EventLinkerAPI.user.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.youcode.EventLinkerAPI.organizer.DTOs.OrganizerRegistrationDTO;
 import org.youcode.EventLinkerAPI.organizer.Organizer;
+import org.youcode.EventLinkerAPI.review.DTOs.EmbeddedReviewDTO;
+import org.youcode.EventLinkerAPI.review.Review;
 import org.youcode.EventLinkerAPI.shared.utils.interfaces.mappers.BaseEmbeddedMapper;
 import org.youcode.EventLinkerAPI.user.DTOs.EmbeddedUserDTO;
 import org.youcode.EventLinkerAPI.user.User;
@@ -15,4 +18,7 @@ import java.time.LocalDateTime;
 public interface UserMapper extends BaseEmbeddedMapper<User , EmbeddedUserDTO> {
     public abstract Organizer toEntity(OrganizerRegistrationDTO dto);
     public abstract Worker toEntity(WorkerRegistrationDTO dto);
+    @Override
+    @Mapping(target = "username" , expression="java(entity.getUsernameField())")
+    EmbeddedUserDTO toEmbeddedDTO(User entity);
 }

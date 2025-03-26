@@ -22,8 +22,7 @@ public class WebSocketEventListener {
         if (principalObj instanceof UsernamePasswordAuthenticationToken) {
             UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) principalObj;
             Object principal = auth.getPrincipal();
-            if (principal instanceof User) {
-                User authenticatedUser = (User) principal;
+            if (principal instanceof User authenticatedUser) {
                 SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.wrap(event.getMessage());
                 String sessionId = headerAccessor.getSessionId();
                 webSocketSessionManager.trackUserSession(authenticatedUser, sessionId);

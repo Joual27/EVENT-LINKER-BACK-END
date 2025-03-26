@@ -7,7 +7,7 @@ import org.youcode.EventLinkerAPI.application.Application;
 import org.youcode.EventLinkerAPI.application.DTOs.ApplicationResponseDTO;
 import org.youcode.EventLinkerAPI.application.enums.ApplicationStatus;
 import org.youcode.EventLinkerAPI.application.interfaces.ApplicationService;
-import org.youcode.EventLinkerAPI.applicationEvents.events.ApplicationConfirmedEvent;
+import org.youcode.EventLinkerAPI.application.events.ApplicationConfirmedEvent;
 import org.youcode.EventLinkerAPI.exceptions.EntityNotFoundException;
 import org.youcode.EventLinkerAPI.exceptions.UnsupportedActionException;
 import org.youcode.EventLinkerAPI.organizer.interfaces.OrganizerService;
