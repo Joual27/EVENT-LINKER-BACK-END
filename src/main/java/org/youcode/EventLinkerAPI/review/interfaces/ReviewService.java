@@ -1,14 +1,13 @@
 package org.youcode.EventLinkerAPI.review.interfaces;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.youcode.EventLinkerAPI.review.DTOs.AverageReviewResponseDTO;
 import org.youcode.EventLinkerAPI.review.DTOs.ReviewResponseDTO;
 import org.youcode.EventLinkerAPI.review.DTOs.SubmitReviewDTO;
-import org.youcode.EventLinkerAPI.review.Review;
+import org.youcode.EventLinkerAPI.shared.utils.DTOs.PaginationDTO;
+
+import java.util.List;
 
 public interface ReviewService {
     ReviewResponseDTO submitReview(SubmitReviewDTO data);
     AverageReviewResponseDTO getUserAvgReview();
-    Page<ReviewResponseDTO> getUserReviews(int page , int size);
+    PaginationDTO<List<ReviewResponseDTO>> getUserReviews(int page , int size , Long id);
 }

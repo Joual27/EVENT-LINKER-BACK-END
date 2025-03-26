@@ -7,14 +7,18 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.youcode.EventLinkerAPI.event.DTOs.CreateAndUpdateEventDTO;
+import org.youcode.EventLinkerAPI.event.DTOs.CreateEventDTO;
 import org.youcode.EventLinkerAPI.event.DTOs.EventResponseDTO;
+import org.youcode.EventLinkerAPI.event.DTOs.UpdateEventDTO;
 import org.youcode.EventLinkerAPI.event.interfaces.EventService;
 import org.youcode.EventLinkerAPI.event.mapper.EventMapper;
 import org.youcode.EventLinkerAPI.exceptions.EntityNotFoundException;
 import org.youcode.EventLinkerAPI.organizer.Organizer;
-import java.time.LocalDateTime;
+import org.youcode.EventLinkerAPI.shared.utils.DTOs.PaginationDTO;
+import org.youcode.EventLinkerAPI.shared.utils.interfaces.FileUploadService;
 
+import java.time.LocalDateTime;
+import java.util.List;
 
 
 @AllArgsConstructor
@@ -22,41 +26,46 @@ import java.time.LocalDateTime;
 public class EventServiceImp implements EventService {
     private final EventDAO eventDAO;
     private final EventMapper eventMapper;
+    private final FileUploadService fileUploadService;
 
     @Override
-    public EventResponseDTO saveEvent(CreateAndUpdateEventDTO data) {
+    public EventResponseDTO saveEvent(CreateEventDTO data) {
         if (!isValidDate(data.date())){
             throw new IllegalArgumentException("Event date must be in the future !");
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Organizer eventOrganizer = (Organizer) authentication.getPrincipal();
+        String imgUrl = fileUploadService.uploadImage(data.img());
         Event event = eventMapper.toEntity(data);
         event.setOrganizer(eventOrganizer);
+        event.setImgUrl(imgUrl);
         Event createdEvent = eventDAO.save(event);
         return eventMapper.toResponseDTO(createdEvent);
     }
 
     @Override
-    public EventResponseDTO updateEvent(CreateAndUpdateEventDTO data , Long id) {
+    public EventResponseDTO updateEvent(UpdateEventDTO data , Long id) {
         Organizer eventOrganizer = (Organizer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Event eventToUpdate = getEventEntityById(id);
         assertIsOrganizerEvent(eventToUpdate , "You can't Update an error that ain't Yours !");
         if (!isValidDate(data.date())){
             throw new IllegalArgumentException("Event date must be in the future !");
         }
-        Event event = eventMapper.toEntity(data);
+        Event event = eventMapper.updateDTOToEntity(data);
         event.setOrganizer(eventOrganizer);
         event.setId(id);
+        event.setImgUrl(eventToUpdate.getImgUrl());
         Event updatedEvent = eventDAO.save(event);
         return eventMapper.toResponseDTO(updatedEvent);
     }
 
     @Override
-    public Page<EventResponseDTO> getAllEvents(int page , int size) {
+    public PaginationDTO<List<EventResponseDTO>> getAllEvents(int page , int size){
         PageRequest pageRequest = PageRequest.of(page, size);
         Organizer eventOrganizer = (Organizer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Page<Event> events = eventDAO.findByOrganizer_Id( eventOrganizer.getId(), pageRequest);
-        return events.map(eventMapper::toResponseDTO);
+        Page<EventResponseDTO> eventsResponse =  events.map(eventMapper::toResponseDTO);
+        return new PaginationDTO<>(events.hasNext() , events.hasPrevious() , eventsResponse.getContent());
     }
 
     @Override

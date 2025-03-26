@@ -1,11 +1,11 @@
-package org.youcode.EventLinkerAPI.applicationEvents.listeners;
+package org.youcode.EventLinkerAPI.application.listeners;
 
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.youcode.EventLinkerAPI.application.Application;
-import org.youcode.EventLinkerAPI.applicationEvents.events.ApplicationConfirmedEvent;
+import org.youcode.EventLinkerAPI.application.events.ApplicationConfirmedEvent;
 import org.youcode.EventLinkerAPI.worker.interfaces.WorkerService;
 
 @Component

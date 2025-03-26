@@ -11,6 +11,7 @@ import org.youcode.EventLinkerAPI.review.DTOs.AverageReviewResponseDTO;
 import org.youcode.EventLinkerAPI.review.DTOs.ReviewResponseDTO;
 import org.youcode.EventLinkerAPI.review.DTOs.SubmitReviewDTO;
 import org.youcode.EventLinkerAPI.review.interfaces.ReviewService;
+import org.youcode.EventLinkerAPI.shared.utils.DTOs.PaginationDTO;
 import org.youcode.EventLinkerAPI.shared.utils.DTOs.SuccessDTO;
 
 import java.util.List;
@@ -27,16 +28,15 @@ public class ReviewController {
         return new ResponseEntity<>(new SuccessDTO<>("success" , "review submitted successfully !" , res ), HttpStatus.CREATED);
     }
 
-    @GetMapping
-    public ResponseEntity<SuccessDTO<List<ReviewResponseDTO>>> getAllUserReviews(@RequestParam(defaultValue = "0") int page , @RequestParam(defaultValue = "5") int size){
-        Page<ReviewResponseDTO> res = reviewService.getUserReviews(page, size);
-        return new ResponseEntity<>(new SuccessDTO<>("success" , "reviews retrieved successfully !" , res.getContent()) , HttpStatus.OK);
+    @GetMapping("/{id}")
+    public ResponseEntity<SuccessDTO<PaginationDTO<List<ReviewResponseDTO>>>> getAllUserReviews(@RequestParam(defaultValue = "0") int page , @RequestParam(defaultValue = "5") int size , @PathVariable("id") Long id){
+        PaginationDTO<List<ReviewResponseDTO>> res = reviewService.getUserReviews(page, size , id);
+        return new ResponseEntity<>(new SuccessDTO<>("success" , "reviews retrieved successfully !" , res) , HttpStatus.OK);
     }
 
     @GetMapping("/avg")
     public ResponseEntity<SuccessDTO<AverageReviewResponseDTO>> getUserAverageReview(){
         AverageReviewResponseDTO res = reviewService.getUserAvgReview();
         return new ResponseEntity<>(new SuccessDTO<>("success" , "AVG USER review retrieved successfully !" , res ), HttpStatus.OK);
-
     }
 }

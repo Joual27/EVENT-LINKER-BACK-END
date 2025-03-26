@@ -27,7 +27,10 @@ public abstract class User implements UserDetails {
     private String username;
     private String email;
     private String password;
+    @Column(nullable = true)
     private String bio;
+    @Column(nullable = true)
+    private String profileImgUrl;
     private LocalDateTime createdAt;
 
     @ToString.Exclude

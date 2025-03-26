@@ -1,13 +1,17 @@
 package org.youcode.EventLinkerAPI.user;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.youcode.EventLinkerAPI.application.enums.ApplicationStatus;
+import org.youcode.EventLinkerAPI.event.mapper.EventMapper;
 import org.youcode.EventLinkerAPI.exceptions.EntityNotFoundException;
 import org.youcode.EventLinkerAPI.organizer.DTOs.OrganizerStatsResponseDTO;
 import org.youcode.EventLinkerAPI.organizer.Organizer;
 import org.youcode.EventLinkerAPI.review.Review;
-import org.youcode.EventLinkerAPI.review.ReviewDAO;
+import org.youcode.EventLinkerAPI.review.mapper.ReviewMapper;
+import org.youcode.EventLinkerAPI.shared.utils.interfaces.FileUploadService;
+import org.youcode.EventLinkerAPI.user.DTOs.UpdateProfileDTO;
 import org.youcode.EventLinkerAPI.user.DTOs.UserResponseDTO;
 import org.youcode.EventLinkerAPI.user.DTOs.UserStatsResponseDTO;
 import org.youcode.EventLinkerAPI.user.interfaces.UserService;
@@ -15,11 +19,14 @@ import org.youcode.EventLinkerAPI.worker.DTOs.WorkerStatsResponseDTO;
 import org.youcode.EventLinkerAPI.worker.Worker;
 
 
+
 @AllArgsConstructor
 @Service
-public class UserServiceImp implements UserService {
+    public class UserServiceImp implements UserService {
     private final UserDAO userDAO;
-    private final ReviewDAO reviewDAO;
+    private final ReviewMapper reviewMapper;
+    private final EventMapper eventMapper;
+    private final FileUploadService fileUploadService;
 
 
     @Override
@@ -31,7 +38,7 @@ public class UserServiceImp implements UserService {
     @Override
     public UserResponseDTO getUserData(Long id) {
         User user = getUserEntityById(id);
-        return UserResponseDTO.fromUser(user);  
+        return UserResponseDTO.fromUser(user , reviewMapper , eventMapper);
     }
 
     @Override
@@ -42,6 +49,20 @@ public class UserServiceImp implements UserService {
         } else{
             return getWorkerStats((Worker) existingUser);
         }
+    }
+
+    @Override
+    public UserResponseDTO updateProfile(UpdateProfileDTO data) {
+        User loggedInUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (data.profileImg() != null && !data.profileImg().isEmpty()){
+            String imgUrl = fileUploadService.uploadImage(data.profileImg());
+            loggedInUser.setProfileImgUrl(imgUrl);
+        }
+        if (data.bio() != null && !data.bio().isEmpty()){
+            loggedInUser.setBio(data.bio());
+        }
+        User updatedUser = userDAO.save(loggedInUser);
+        return UserResponseDTO.fromUser(updatedUser , reviewMapper , eventMapper);
     }
 
     private OrganizerStatsResponseDTO getOrganizerStats(Organizer organizer) {
@@ -71,7 +92,5 @@ public class UserServiceImp implements UserService {
         }
         return 0;
     }
-
-
 
 }

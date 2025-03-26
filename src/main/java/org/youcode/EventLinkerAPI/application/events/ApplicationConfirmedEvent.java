@@ -1,4 +1,4 @@
-package org.youcode.EventLinkerAPI.applicationEvents.events;
+package org.youcode.EventLinkerAPI.application.events;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
@@ -8,7 +8,6 @@ import org.youcode.EventLinkerAPI.application.Application;
 public class ApplicationConfirmedEvent extends ApplicationEvent {
     private final Application application;
     private final double amount ;
-
 
     public ApplicationConfirmedEvent(Object source , Application application, double amount){
         super(source);

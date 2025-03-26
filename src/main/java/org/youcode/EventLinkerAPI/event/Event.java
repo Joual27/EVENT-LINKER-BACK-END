@@ -20,6 +20,8 @@ public class Event extends BaseEntity {
     private LocalDateTime date;
     private String location;
 
+    @Column(name = "IMG_URL")
+    private String imgUrl;
 
     @ManyToOne
     @JoinColumn(name = "ORGANIZER_ID")
