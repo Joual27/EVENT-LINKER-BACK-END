@@ -94,6 +94,15 @@ public class EventServiceImp implements EventService {
                 .orElseThrow(() -> new EntityNotFoundException("No Event Was Found With Given Id !"));
     }
 
+    @Override
+    public List<EventResponseDTO> getAllEventsNoPagination() {
+        Organizer eventOrganizer = (Organizer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<Event> res = eventDAO.findByOrganizer(eventOrganizer);
+        return res.stream()
+                .map(eventMapper::toResponseDTO)
+                .toList();
+    }
+
     private void assertIsOrganizerEvent(Event event , String message){
         Organizer eventOrganizer = (Organizer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!event.getOrganizer().getId().equals(eventOrganizer.getId())){

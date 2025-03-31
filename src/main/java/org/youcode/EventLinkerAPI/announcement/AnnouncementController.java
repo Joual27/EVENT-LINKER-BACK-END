@@ -10,6 +10,7 @@ import org.youcode.EventLinkerAPI.announcement.DTOs.AnnouncementResponseDTO;
 import org.youcode.EventLinkerAPI.announcement.DTOs.CreateAnnouncementDTO;
 import org.youcode.EventLinkerAPI.announcement.DTOs.UpdateAnnouncementDTO;
 import org.youcode.EventLinkerAPI.announcement.interfaces.AnnouncementService;
+import org.youcode.EventLinkerAPI.shared.utils.DTOs.PaginationDTO;
 import org.youcode.EventLinkerAPI.shared.utils.DTOs.SuccessDTO;
 
 import java.util.List;
@@ -33,10 +34,11 @@ public class AnnouncementController {
     }
 
     @GetMapping
-    public ResponseEntity<SuccessDTO<List<AnnouncementResponseDTO>>> getAuthenticatedOrganizerAnnouncements(@RequestParam(defaultValue = "0") int page , @RequestParam(defaultValue = "1") int size){
-        Page<AnnouncementResponseDTO> res = announcementService.getAllAnnouncements(page, size);
-        return new ResponseEntity<>(new SuccessDTO<>("success" , "Announcements of page " + page +" Retrieved Successfully !" , res.getContent()) , HttpStatus.OK);
+    public ResponseEntity<SuccessDTO<PaginationDTO<List<AnnouncementResponseDTO>>>> getAuthenticatedOrganizerAnnouncements(@RequestParam(defaultValue = "0") int page , @RequestParam(defaultValue = "7") int size){
+        PaginationDTO<List<AnnouncementResponseDTO>> res = announcementService.getAllAnnouncements(page, size);
+        return new ResponseEntity<>(new SuccessDTO<>("success" , "Announcements of page " + page +" Retrieved Successfully !" , res) , HttpStatus.OK);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<SuccessDTO<AnnouncementResponseDTO>> getAnnouncementById(@PathVariable("id") Long id){

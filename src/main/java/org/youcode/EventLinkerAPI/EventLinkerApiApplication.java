@@ -11,4 +11,3 @@ public class EventLinkerApiApplication {
 		SpringApplication.run(EventLinkerApiApplication.class, args);
 	}
 }
-
