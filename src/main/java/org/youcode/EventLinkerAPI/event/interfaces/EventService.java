@@ -15,4 +15,5 @@ public interface EventService {
     EventResponseDTO getEventById(Long id);
     EventResponseDTO deleteEvent(Long id);
     Event getEventEntityById(Long id);
+    List<EventResponseDTO> getAllEventsNoPagination();
 }

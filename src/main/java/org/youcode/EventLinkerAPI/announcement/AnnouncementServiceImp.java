@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -16,14 +17,16 @@ import org.youcode.EventLinkerAPI.announcement.DTOs.UpdateAnnouncementDTO;
 import org.youcode.EventLinkerAPI.announcement.enums.AnnouncementStatus;
 import org.youcode.EventLinkerAPI.announcement.interfaces.AnnouncementService;
 import org.youcode.EventLinkerAPI.announcement.mapper.AnnouncementMapper;
+import org.youcode.EventLinkerAPI.announcement.specifications.AnnouncementSpecification;
 import org.youcode.EventLinkerAPI.event.Event;
 import org.youcode.EventLinkerAPI.event.interfaces.EventService;
 
 import org.youcode.EventLinkerAPI.exceptions.EntityNotFoundException;
 import org.youcode.EventLinkerAPI.exceptions.MaxPendingAnnouncementsReached;
 import org.youcode.EventLinkerAPI.organizer.Organizer;
+import org.youcode.EventLinkerAPI.shared.utils.DTOs.PaginationDTO;
 import org.youcode.EventLinkerAPI.skill.Skill;
-import org.youcode.EventLinkerAPI.skill.SkillService;
+import org.youcode.EventLinkerAPI.skill.interfaces.SkillService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -72,12 +75,22 @@ public class AnnouncementServiceImp implements AnnouncementService {
     }
 
     @Override
-    public Page<AnnouncementResponseDTO> getAllAnnouncements(int page, int size) {
+    public PaginationDTO<List<AnnouncementResponseDTO>> getAllAnnouncements(int page , int size) {
         PageRequest pageRequest = PageRequest.of(page,size);
         Organizer authenticatedOrganizer = (Organizer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Page<Announcement> announcements = announcementDAO.findByEvent_Organizer_Id(pageRequest , authenticatedOrganizer.getId());
-        return announcements.map(announcementMapper::toResponseDTO);
+        Page<AnnouncementResponseDTO> res =  announcements.map(announcementMapper::toResponseDTO);
+        return new PaginationDTO<>(announcements.hasNext() , announcements.hasPrevious() , res.getContent());
     }
+
+    @Override
+    public PaginationDTO<List<AnnouncementResponseDTO>> getAllUsersAnnouncements(int page , int size) {
+        PageRequest pageRequest = PageRequest.of(page,size);
+        Page<Announcement> announcements = announcementDAO.findAll(pageRequest);
+        Page<AnnouncementResponseDTO> res =  announcements.map(announcementMapper::toResponseDTO);
+        return new PaginationDTO<>(announcements.hasNext() , announcements.hasPrevious() , res.getContent());
+    }
+
 
     @Override
     public AnnouncementResponseDTO getAnnouncementById(Long id) {
@@ -106,6 +119,19 @@ public class AnnouncementServiceImp implements AnnouncementService {
         Announcement announcementToUpdate = appendNewStatusToAnnouncement(existingAnnouncement , expectedOperation);
         Announcement updatedAnnouncement = announcementDAO.save(announcementToUpdate);
         return announcementMapper.toResponseDTO(updatedAnnouncement);
+    }
+
+    @Override
+    public PaginationDTO<List<AnnouncementResponseDTO>>filterAnnouncements(int page , int size , String term){
+        PageRequest pageRequest = PageRequest.of(page , size);
+        Page<Announcement> filteredAnnouncements = announcementDAO.findAll(
+                Specification.where(AnnouncementSpecification.withSearchQuery(term)),
+                pageRequest
+        );
+        List<AnnouncementResponseDTO> announcements = filteredAnnouncements.getContent().stream()
+                .map(announcementMapper::toResponseDTO)
+                .toList();
+        return new PaginationDTO<>(filteredAnnouncements.hasNext() , filteredAnnouncements.hasPrevious() , announcements);
     }
 
     private void assertAnnouncementBelongsToOrganizer(Event event , String message){

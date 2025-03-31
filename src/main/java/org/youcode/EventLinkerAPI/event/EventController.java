@@ -51,4 +51,11 @@ public class EventController {
         EventResponseDTO res = eventService.deleteEvent(id);
         return new ResponseEntity<>(new SuccessDTO<>("success" , "Event Deleted Successfully !" , res) , HttpStatus.OK);
     }
+
+    @GetMapping("/no-pagination")
+    public ResponseEntity<SuccessDTO<List<EventResponseDTO>>> getAllEventsWithoutPagination(){
+        List<EventResponseDTO> res = eventService.getAllEventsNoPagination();
+        return new ResponseEntity<>(new SuccessDTO<>("success" , "Events Retrieved Successfully !" , res) , HttpStatus.OK);
+    }
+
 }

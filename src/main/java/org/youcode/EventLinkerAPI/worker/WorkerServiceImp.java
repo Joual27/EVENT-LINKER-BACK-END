@@ -6,7 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.youcode.EventLinkerAPI.exceptions.EntityNotFoundException;
 import org.youcode.EventLinkerAPI.skill.Skill;
-import org.youcode.EventLinkerAPI.skill.SkillService;
+import org.youcode.EventLinkerAPI.skill.interfaces.SkillService;
 import org.youcode.EventLinkerAPI.worker.DTOs.EmbeddedWorkerSkillsCreationalDTO;
 import org.youcode.EventLinkerAPI.worker.DTOs.UpdateWorkerSkillsDTO;
 import org.youcode.EventLinkerAPI.worker.DTOs.WorkerSkillsResponseDTO;

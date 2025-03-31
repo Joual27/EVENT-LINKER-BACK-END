@@ -1,4 +1,6 @@
 package org.youcode.EventLinkerAPI.event.DTOs;
 
-public record EmbeddedEventDTO(String title , String description) {
+import java.time.LocalDateTime;
+
+public record EmbeddedEventDTO(String title , String description , String imgUrl , String location, LocalDateTime date) {
 }
