@@ -19,9 +19,11 @@ import org.youcode.EventLinkerAPI.application.mapper.ApplicationMapper;
 import org.youcode.EventLinkerAPI.exceptions.EntityNotFoundException;
 import org.youcode.EventLinkerAPI.exceptions.UnacceptedAnnouncementStatusException;
 import org.youcode.EventLinkerAPI.exceptions.UnpayableApplicationStatusException;
+import org.youcode.EventLinkerAPI.shared.utils.DTOs.PaginationDTO;
 import org.youcode.EventLinkerAPI.worker.Worker;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @Service
@@ -98,8 +100,18 @@ public class ApplicationServiceImp implements ApplicationService {
         return applicationMapper.toResponseDTO(updatedApplication);
     }
 
-    private void assertAnnouncementIsPending(Announcement announcement){
-        if (!announcement.getStatus().equals(AnnouncementStatus.ACTIVE)){
+    @Override
+    public PaginationDTO<List<ApplicationResponseDTO>> getAnnouncementApplications(int page, int size ,Long announcementId){
+        PageRequest pageRequest = PageRequest.of(page , size);
+        Page<Application> applications = applicationDAO.findAllByAnnouncement_IdAndStatus(pageRequest , announcementId , ApplicationStatus.PENDING);
+        List<ApplicationResponseDTO> res = applications.getContent().stream()
+                .map(applicationMapper::toResponseDTO)
+                .toList();
+        return new PaginationDTO<>(applications.hasNext() , applications.hasPrevious() , res);
+    }
+
+    private void assertAnnouncementIsPending(Announcement announcement) {
+        if (!announcement.getStatus().equals(AnnouncementStatus.ACTIVE)) {
             throw new UnacceptedAnnouncementStatusException("You can only apply for announcements with status 'Active' !");
         }
     }

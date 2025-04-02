@@ -3,6 +3,7 @@ package org.youcode.EventLinkerAPI.message;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class ProducerServiceImp implements ProducerService {
     private final DMService dmService;
     private final MessageMapper messageMapper;
     private final KafkaTemplate<String, MessageResponseDTO> kafkaTemplate;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     @Override
@@ -41,9 +43,7 @@ public class ProducerServiceImp implements ProducerService {
         Message messageWithData = fillMessageDefaultData(messageToSend , user , existingDm , data.content());
         Message createdMessage = messageDAO.save(messageWithData);
         MessageResponseDTO res = messageMapper.toResponseDTO(createdMessage);
-        System.out.println(res);
         kafkaTemplate.send("direct-messages" , messageToSend.getDm().getId().toString() , res);
-
     }
 
     private Message fillMessageDefaultData(Message message , User user , DM dm , String content){

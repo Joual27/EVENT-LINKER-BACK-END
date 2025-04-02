@@ -18,4 +18,6 @@ public interface MessageDAO extends JpaRepository<Message , Long> {
             "LEFT JOIN FETCH d.users " +
             "WHERE m.id = :id")
     Optional<Message> findByIdWithRelations(@Param("id") Long id);
+
+    Optional<Message> findTopByDmIdOrderBySentAtDesc(Long dmId);
 }

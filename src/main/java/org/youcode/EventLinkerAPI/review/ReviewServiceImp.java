@@ -3,8 +3,7 @@ package org.youcode.EventLinkerAPI.review;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.youcode.EventLinkerAPI.application.Application;
@@ -48,7 +47,7 @@ public class ReviewServiceImp implements ReviewService {
     @Override
     public AverageReviewResponseDTO getUserAvgReview() {
         User authenticatedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return new AverageReviewResponseDTO(new EmbeddedUserDTO(authenticatedUser.getEmail() , authenticatedUser.getProfileImgUrl()) , reviewDAO.getAvgRatingByReviewee(authenticatedUser) , getUserReviewsCount(authenticatedUser));
+        return new AverageReviewResponseDTO(new EmbeddedUserDTO(authenticatedUser.getId(), authenticatedUser.getEmail() , authenticatedUser.getProfileImgUrl()) , reviewDAO.getAvgRatingByReviewee(authenticatedUser) , getUserReviewsCount(authenticatedUser));
     }
 
     @Override
