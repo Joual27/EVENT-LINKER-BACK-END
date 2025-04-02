@@ -16,7 +16,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class DM extends BaseEntity {
-    @OneToMany(mappedBy = "dm")
+    @OneToMany(mappedBy = "dm" , fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
     private List<Message> messages;
     @ManyToMany()

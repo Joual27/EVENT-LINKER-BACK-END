@@ -18,4 +18,5 @@ public interface AnnouncementService {
     Announcement getAnnouncementEntityById(Long id);
     AnnouncementResponseDTO updateAnnouncementStatus(String expectedOperation , Long id);
     PaginationDTO<List<AnnouncementResponseDTO>>filterAnnouncements(int page , int size, String term);
+
 }

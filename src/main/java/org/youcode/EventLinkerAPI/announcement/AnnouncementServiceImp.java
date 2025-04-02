@@ -53,7 +53,7 @@ public class AnnouncementServiceImp implements AnnouncementService {
         announcementToCreate.setAnnouncementSkills(announcementSkills);
         announcementToCreate.setEvent(existingEvent);
         announcementToCreate.setCreatedAt(LocalDateTime.now());
-        announcementToCreate.setStatus(AnnouncementStatus.PENDING);
+        announcementToCreate.setStatus(AnnouncementStatus.ACTIVE);
         Announcement createdAnnouncement = announcementDAO.save(announcementToCreate);
         return announcementMapper.toResponseDTO(createdAnnouncement);
     }
